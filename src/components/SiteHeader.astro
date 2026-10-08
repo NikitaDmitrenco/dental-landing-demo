@@ -1,0 +1,25 @@
+<header class="site-header" id="top">
+  <div class="header-inner wrap">
+    <a class="brand" href="#top" aria-label="Dentiva — на главную"><span class="brand-mark" aria-hidden="true">d.</span><span>Dentiva</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Открыть меню"><span></span><span></span></button>
+    <nav id="primary-nav" class="main-nav" aria-label="Основная навигация">
+      <a href="#services">Услуги</a><a href="#about">О клинике</a><a href="#reviews">Отзывы</a><a href="#contacts">Контакты</a>
+      <button class="button button-dark nav-cta" type="button" data-open-appointment>Записаться <span aria-hidden="true">↗</span></button>
+    </nav>
+  </div>
+</header>
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const nav = document.querySelector<HTMLElement>('#primary-nav');
+  toggle?.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    toggle.setAttribute('aria-label', expanded ? 'Открыть меню' : 'Закрыть меню');
+    nav?.classList.toggle('is-open', !expanded);
+  });
+  nav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+    toggle?.setAttribute('aria-expanded', 'false');
+    toggle?.setAttribute('aria-label', 'Открыть меню');
+    nav?.classList.remove('is-open');
+  }));
+</script>

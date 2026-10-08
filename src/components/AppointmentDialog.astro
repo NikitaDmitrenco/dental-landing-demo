@@ -1,0 +1,72 @@
+---
+import { services } from '../data/services';
+---
+<dialog class="appointment-dialog" id="appointment-dialog" aria-labelledby="dialog-title">
+  <div class="dialog-inner">
+    <button class="dialog-close" type="button" aria-label="Закрыть окно" data-close-appointment>×</button>
+    <div class="eyebrow"><span class="eyebrow-dot"></span> Первый шаг — разговор</div>
+    <h2 id="dialog-title">Давайте знакомиться</h2>
+    <p class="dialog-intro">Оставьте контакты — мы сориентируем по следующему шагу.</p>
+    <p class="demo-alert"><span aria-hidden="true">ⓘ</span> Демо-форма — данные не отправляются</p>
+    <form id="appointment-form" novalidate>
+      <div class="field"><label for="patient-name">Ваше имя <span>*</span></label><input id="patient-name" name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться?" required aria-describedby="name-error"><small class="field-error" id="name-error"></small></div>
+      <div class="field"><label for="patient-phone">Телефон <span>*</span></label><input id="patient-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__" required aria-describedby="phone-error"><small class="field-error" id="phone-error"></small></div>
+      <div class="field"><label for="patient-service">Что вас интересует?</label><select id="patient-service" name="service"><option value="">Нужна консультация</option>{services.map((service) => <option value={service.id}>{service.title}</option>)}</select></div>
+      <p class="privacy-copy">Администратор свяжется с вами, чтобы уточнить удобное время</p>
+      <button class="button button-dark submit-button" type="submit"><span>Проверить заявку</span><span aria-hidden="true">↗</span></button>
+      <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</dialog>
+<script>
+  import { submitAppointment } from '../lib/submit-appointment';
+  const dialog = document.querySelector<HTMLDialogElement>('#appointment-dialog');
+  const form = document.querySelector<HTMLFormElement>('#appointment-form');
+  const status = document.querySelector<HTMLElement>('#form-status');
+  const nameInput = document.querySelector<HTMLInputElement>('#patient-name');
+  const phoneInput = document.querySelector<HTMLInputElement>('#patient-phone');
+  const serviceSelect = document.querySelector<HTMLSelectElement>('#patient-service');
+  let returnFocus: HTMLElement | null = null;
+  const openDialog = (event?: Event) => {
+    returnFocus = event?.currentTarget instanceof HTMLElement ? event.currentTarget : document.activeElement as HTMLElement;
+    const requestedService = (event?.currentTarget as HTMLElement | null)?.dataset.service;
+    if (requestedService && serviceSelect) serviceSelect.value = requestedService;
+    if (!dialog?.open) dialog?.showModal();
+    window.setTimeout(() => nameInput?.focus(), 0);
+  };
+  document.querySelectorAll<HTMLElement>('[data-open-appointment]').forEach((button) => button.addEventListener('click', openDialog));
+  document.querySelectorAll<HTMLElement>('[data-close-appointment]').forEach((button) => button.addEventListener('click', () => dialog?.close()));
+  dialog?.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+  dialog?.addEventListener('close', () => { status && (status.textContent = ''); returnFocus?.focus(); });
+  dialog?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab') return;
+    const elements = [...dialog.querySelectorAll<HTMLElement>('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')].filter((item) => !item.hasAttribute('disabled'));
+    const first = elements[0]; const last = elements[elements.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+  });
+  function setError(input: HTMLInputElement, message: string) {
+    const error = document.querySelector<HTMLElement>(`#${input.id === 'patient-name' ? 'name-error' : 'phone-error'}`);
+    input.setAttribute('aria-invalid', String(Boolean(message)));
+    if (error) error.textContent = message;
+  }
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!form || !nameInput || !phoneInput || !serviceSelect) return;
+    status && (status.textContent = '');
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const digits = phone.replace(/\D/g, '');
+    const phoneOkay = /^\+?[\d\s().-]+$/.test(phone) && digits.length >= 7 && digits.length <= 15;
+    setError(nameInput, name.length < 2 ? 'Введите имя (не менее 2 символов).' : '');
+    setError(phoneInput, !phone ? 'Укажите номер телефона.' : !phoneOkay ? 'Проверьте номер: нужно от 7 до 15 цифр.' : '');
+    if (name.length < 2 || !phoneOkay) return;
+    const button = form.querySelector<HTMLButtonElement>('.submit-button');
+    if (!button || button.disabled) return;
+    button.disabled = true; button.setAttribute('aria-busy', 'true');
+    try {
+      const result = await submitAppointment({ name, phone, service: serviceSelect.value });
+      if (status) { status.textContent = result.message; status.classList.add('is-success'); }
+    } finally { button.disabled = false; button.removeAttribute('aria-busy'); }
+  });
+</script>

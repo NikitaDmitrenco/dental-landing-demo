@@ -1,0 +1,11 @@
+---
+import { contacts } from '../data/contacts';
+---
+<footer class="site-footer">
+  <div class="wrap footer-main">
+    <div><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true">d.</span><span>Dentiva</span></a><p class="footer-note">С заботой о вашем спокойствии и здоровье улыбки.</p></div>
+    <nav class="footer-nav" aria-label="Навигация в подвале"><a href="#services">Услуги</a><a href="#about">О клинике</a><a href="#reviews">Отзывы</a><a href="#contacts">Контакты</a></nav>
+    <div class="footer-contact"><a href={contacts.phoneHref}>{contacts.phoneDisplay}</a><span>{contacts.address}</span></div>
+  </div>
+  <div class="wrap footer-bottom"><span>© Dentiva · Демонстрационный сайт</span><p>Демонстрационный проект. Клиника, специалисты, цены и отзывы вымышлены.</p></div>
+</footer>
