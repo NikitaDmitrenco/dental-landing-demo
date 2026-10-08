@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { services } from '../data/services';
+import { reviews } from '../data/reviews';
+import { contacts } from '../data/contacts';
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout>
+  <main id="main-content">
+    <section class="hero section-pad" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> Современная стоматология · Москва</div>
+          <h1 id="hero-title">Здоровая улыбка начинается <em>с заботы</em></h1>
+          <p class="hero-lede">В Dentiva важно не только что мы делаем, но и как вы себя чувствуете. Объясняем каждый шаг и помогаем выбрать подходящий план.</p>
+          <div class="hero-actions"><button class="button button-dark" type="button" data-open-appointment>Записаться на приём <span aria-hidden="true">↗</span></button><a class="text-link" href="#services">Посмотреть услуги <span aria-hidden="true">↓</span></a></div>
+          <div class="hero-meta"><span class="meta-icon" aria-hidden="true">✳</span><span>Спокойный подход<br /><strong>на каждом этапе</strong></span></div>
+        </div>
+        <div class="hero-visual"><img src={`${base}images/clinic-interior.jpg`} alt="Светлый современный интерьер стоматологического кабинета" fetchpriority="high" /><div class="image-caption"><span class="caption-dot"></span><span>Пространство, где можно выдохнуть</span><span class="caption-arrow" aria-hidden="true">↗</span></div><div class="hero-stamp" aria-hidden="true"><span>внимание</span><b>к вам</b><span>на каждом шаге</span></div></div>
+      </div>
+      <div class="wrap hero-foot"><span>01 / Забота прежде всего</span><span>Прокрутите, чтобы узнать больше <span aria-hidden="true">↓</span></span></div>
+    </section>
+
+    <section class="services section-pad" id="services" aria-labelledby="services-title">
+      <div class="wrap">
+        <div class="section-head services-head"><div><div class="eyebrow"><span class="eyebrow-dot"></span> Чем поможем</div><h2 id="services-title">Забота, которой<br /><em>можно доверять</em></h2></div><p class="section-aside">От профилактики до сложных решений — сначала внимательно изучаем ситуацию и вместе обсуждаем план.</p></div>
+        <div class="service-list">{services.map((service, index) => <article class:list={['service-row', index === 0 && 'service-featured']}><div class="service-index">{service.number}</div><div class="service-main"><h3>{service.title}</h3><p>{service.description}</p></div><div class="service-price"><strong>{service.price}</strong><span>{service.note}</span></div><button class="service-book" type="button" data-open-appointment data-service={service.id} aria-label={`Записаться: ${service.title}`}><span>Обсудить</span><span aria-hidden="true">↗</span></button></article>)}</div>
+        <p class="price-note">Указаны примерные цены для демонстрации. Итоговая стоимость зависит от объёма и плана лечения.</p>
+      </div>
+    </section>
+
+    <section class="about section-pad" id="about" aria-labelledby="about-title">
+      <div class="wrap about-grid"><div class="about-image"><img src={`${base}images/clinic-care.jpg`} alt="Врач Dentiva обсуждает план заботы о здоровье пациента" loading="lazy" /><span class="photo-label">Сначала — слушаем</span></div><div class="about-copy"><div class="eyebrow"><span class="eyebrow-dot"></span> О клинике</div><h2 id="about-title">Больше ясности.<br /><em>Меньше тревоги.</em></h2><p class="about-lede">Стоматология не должна быть загадкой. Мы создаём пространство для честного разговора о здоровье, понятных решениях и внимательного отношения к человеку.</p><div class="principles"><article><span class="principle-no">01</span><div><h3>Понятный план</h3><p>Объясняем варианты лечения и обсуждаем каждый шаг до начала.</p></div></article><article><span class="principle-no">02</span><div><h3>Ваш комфорт</h3><p>Учитываем вопросы, пожелания и темп, который подходит именно вам.</p></div></article><article><span class="principle-no">03</span><div><h3>Забота о профилактике</h3><p>Делимся рекомендациями, которые помогают внимательнее относиться к здоровью улыбки.</p></div></article></div><button class="button button-outline" type="button" data-open-appointment>Познакомиться поближе <span aria-hidden="true">↗</span></button></div></div>
+    </section>
+
+    <section class="reviews section-pad" id="reviews" aria-labelledby="reviews-title">
+      <div class="wrap"><div class="section-head reviews-head"><div><div class="eyebrow"><span class="eyebrow-dot"></span> Слова о заботе</div><h2 id="reviews-title">Важно, как <em>вы себя чувствуете</em></h2></div><p class="review-disclaimer">Примеры отзывов для демонстрации</p></div><div class="review-grid">{reviews.map((review, index) => <figure class:list={['review-card', index === 1 && 'review-featured']}><span class="quote-mark" aria-hidden="true">“</span><blockquote>{review.quote}</blockquote><figcaption><span class="review-avatar" aria-hidden="true">{review.name.slice(0, 1)}</span><span><strong>{review.name}</strong><small>{review.context}</small></span><span class="review-number">0{index + 1}</span></figcaption></figure>)}</div></div>
+    </section>
+
+    <section class="contact section-pad" id="contacts" aria-labelledby="contacts-title">
+      <div class="wrap contact-grid"><div class="contact-copy"><div class="eyebrow"><span class="eyebrow-dot"></span> Мы рядом</div><h2 id="contacts-title">Будем рады<br /><em>знакомству</em></h2><p class="contact-address">{contacts.address}<span>Примерные контактные данные</span></p><a class="contact-phone" href={contacts.phoneHref}>{contacts.phoneDisplay}<span aria-hidden="true">↗</span></a><a class="contact-email" href={`mailto:${contacts.email}`}>{contacts.email}</a><div class="hours"><h3>Часы работы</h3>{contacts.hours.map((item) => <div class="hours-row"><span>{item.days}</span><strong>{item.time}</strong></div>)}</div><p class="demo-contact-note">Контакты и график приведены для демонстрации.</p></div><div class="map-wrap"><iframe title="Пример расположения в центре Москвы" src={contacts.map.embed} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe><div class="map-caption"><span><strong>Пример расположения</strong><small>Москва · ориентир в центре города</small></span><a href={contacts.map.link} target="_blank" rel="noopener noreferrer">Открыть карту <span aria-hidden="true">↗</span></a></div></div></div>
+    </section>
+  </main>
+</BaseLayout>
